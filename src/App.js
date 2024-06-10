@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute';
 import ItemDetails from './Components/ItemDetails/ItemDetails';
 import { Offline, Online } from 'react-detect-offline';
-
+import DataContextProvide from './Context/Context';
 
 
 
@@ -56,7 +56,10 @@ setuserData(decodedToken);
    <div>
     <Offline><div className=' offline bg-danger text-center'>YOU ARE OFFLINE</div></Offline>
    </div>
+   <DataContextProvide>
    <RouterProvider router={routers}/> 
+   </DataContextProvide>
+   
  
    </>
  
