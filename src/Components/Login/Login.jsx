@@ -1,86 +1,97 @@
 import axios from 'axios';
 import Joi from 'joi';
-import React, { useState, useCallback } from 'react';
-import { Helmet, HelmetProvider } from 'react-helmet-async';
+import React, { useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
-import { debounce } from 'lodash';
 
-const loginSchema = Joi.object({
-  email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
-  password: Joi.string().required(),
-  confirmpassword: Joi.ref('password'),
-});
+export default function Login({saveUserData}) {
+  const [errorList, seterrorList] = useState([])
+  let navigate = useNavigate();
+  const [error, setError] = useState('')
+  const [isLoding, setisLoding] = useState(false)
+  const [user, setUser] = useState({
+    email: '',
+    password: '',
+  });
 
-export default function Login({ saveUserData }) {
-  const [errorList, setErrorList] = useState([]);
-  const [error, setError] = useState('');
-  const [isLoding, setIsLoding] = useState(false);
-  const [user, setUser] = useState({ email: '', password: '' });
-  const navigate = useNavigate();
-
-  const getUserData = useCallback(debounce((eventInfo) => {
-    const { name, value } = eventInfo.target;
-    setUser(prevUser => ({ ...prevUser, [name]: value }));
-  }, 300), []);
+  function getUserData(eventInfo) {
+    let myUser = { ...user };
+    myUser[eventInfo.target.name] = eventInfo.target.value;
+    setUser(myUser);
+  }
 
   async function sendLoginToApi() {
-    try {
-      let { data } = await axios.post('https://donation-system-utjy.onrender.com/Login', user);
-      setIsLoding(false);
-      if (data.success) {
-        localStorage.setItem('userToken', data.token);
-        saveUserData();
-        navigate('/');
-      } else {
-        setError(data.message);
-      }
-    } catch (err) {
-      setIsLoding(false);
-      setError('An error occurred. Please try again later.');
+    let { data } = await axios.post('https://donation-system-utjy.onrender.com/Login', user);
+    if (data.success === true) {
+      setisLoding(false);
+      localStorage.setItem('userToken',data.token);
+      saveUserData();
+      navigate('/')
+      // // login
+    }
+    else {
+      setisLoding(false);
+      setError(data.message);
     }
   }
 
   function submitLoginForm(e) {
     e.preventDefault();
-    setIsLoding(true);
-
-    const validation = loginSchema.validate(user, { abortEarly: false });
+    setisLoding(true);
+    
+    let validation = validateLoginform();
+    // console.log(validation);
     if (validation.error) {
-      setIsLoding(false);
-      setErrorList(validation.error.details);
-    } else {
+      setisLoding(false);
+      seterrorList(validation.error.details);
+      
+    }
+    else {
       sendLoginToApi();
     }
   }
 
-  return (
-    <HelmetProvider>
-      <>
-        <Helmet>
-          <meta charSet="utf-8" />
-          <title>Login</title>
-        </Helmet>
+  function validateLoginform() {
+    let scheme = Joi.object({
+      email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required(),
+      password: Joi.string().required(),
+      confirmpassword:Joi.ref('password'),
+     
+    });
+    // console.log(scheme.validate(user));
+    return scheme.validate(user, { abortEarly: false });
+  }
 
-        {errorList.map((err, index) => (
-          <div key={index} className="alert alert-danger my-2">
-            {err.context.label === "password" ? "password invalid" : err.message}
-          </div>
-        ))}
+  return (<>
 
-        {error && <div className="alert alert-danger my-2">{error}</div>}
+<Helmet>
+                <meta charSet="utf-8" />
+                <title>Login</title>
+            </Helmet>
+    
+    {errorList.map((err,index)=> {
+      if(err.context.label === "password"){
+        return <div key={index} className=" alert alert-danger my-2">password invalid</div>
+      }
+      else{
+       return <div key={index} className=" alert alert-danger my-2">{err.message}</div>
+      }
+    })}
 
-        <form onSubmit={submitLoginForm} className='mt-5'>
-          <label htmlFor="email" className='text-white'>email:</label>
-          <input onChange={getUserData} type="email" className='form-control my-input my-2' name='email' id="email"></input>
 
-          <label htmlFor="password" className='text-white'>password:</label>
-          <input onChange={getUserData} type="password" className='form-control my-input my-2' name='password' id="password"></input>
-          
-          <button type='submit' className='btn btn-info'>
-            {isLoding ? <i className='fas fa-spinner fa-spin'></i> : 'Login'}
-          </button>
-        </form>
-      </>
-    </HelmetProvider>
-  );
+    {error.length > 0 ? <div className=" alert alert-danger my-2">{error}</div> : ''}
+    <form onSubmit={submitLoginForm} className='mt-5'>
+    
+
+      <label htmlFor="email" className='text-white'>email:</label>
+      <input onChange={getUserData} type="email" className='form-control my-input my-2' name='email' id="email"></input>
+
+      <label htmlFor="password" className='text-white'>password:</label>
+      <input onChange={getUserData} type="password" className='form-control my-input my-2' name='password' id="password"></input>
+      
+      <button type='submit' className='btn btn-info'>
+        {isLoding === true ? <i className='fas fa-spinner fa-spin'></i> : 'Login'}
+      </button>
+    </form>
+  </>)
 }
