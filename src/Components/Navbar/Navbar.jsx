@@ -8,7 +8,7 @@ export default function Nabbar({userData , logOut}) {
         <h1 className='m-0 pe-3 text-danger'>nexo</h1>
         {userData ? <ul className='list-unstyled m-0 d-flex align-items-center '>
           <li className='px-2'><Link to="/">Home</Link></li>
-          <li className='px-2'><Link to="about">About</Link></li>
+          {/* <li className='px-2'><Link to="about">About</Link></li> */}
           <li className='px-2'><Link to="movies">Movies</Link></li>
           <li className='px-2'><Link to="tv">Tv</Link></li>
           <li className='px-2'><Link to="people">People</Link></li>
