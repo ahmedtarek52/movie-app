@@ -5,13 +5,15 @@ export default function ProtectedRoute(props) {
 // console.log(props);
 if(!localStorage.getItem('userToken'))
 {
+    alert("You must be logged in to view this page");
     // console.log('yes');
     return <Navigate to='/login'/>
 }
-else{
+else{ 
     // console.log('no');
     return props.children;
 
 }
+
 
 } 

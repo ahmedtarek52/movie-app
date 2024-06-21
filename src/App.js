@@ -37,11 +37,11 @@ setuserData(decodedToken);
 }
   let routers = createBrowserRouter ([
     {path:'/' , element:<Layout setuserData={setuserData} userData={userData}/> , children:[
-       { index:true ,element:<ProtectedRoute userData={userData}><Home/></ProtectedRoute>},
-       { path:"movies" ,element:<ProtectedRoute userData={userData}><Movies/> </ProtectedRoute>},
-       { path:"tv" ,element:<ProtectedRoute userData={userData}> <Tv/></ProtectedRoute>},
+       { index:true ,element:<Home/>},
+       { path:"movies" ,element:<Movies/> },
+       { path:"tv" ,element:<Tv/>},
        { path:"profile" ,element:<ProtectedRoute userData={userData}><Profile userData={userData}/> </ProtectedRoute>},
-       { path:"people" ,element:<ProtectedRoute userData={userData}> <People/></ProtectedRoute>},
+       { path:"people" ,element:<People/>},
        { path:"itemdetails/:id/:media_type" ,element:<ProtectedRoute userData={userData}> <ItemDetails/></ProtectedRoute>},
        { path:"login" ,element:<Login  saveUserData={saveUserData}/>},
        { path:'register' ,element:<Register/>}
